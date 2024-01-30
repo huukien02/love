@@ -27,6 +27,7 @@ const MAX_FILE_SIZE = 10485760;
 
 function Profile() {
   const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
+  const [isModalViewEvent, setIsModalViewEvent] = useState(false);
   const [openSideBarMobile, setOpenSideBarMobile] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [hover, setHover] = useState({
@@ -213,6 +214,16 @@ function Profile() {
     setIsModalDetailOpen(true);
   };
 
+  const closeModalViewEvent = () => {
+    setIsModalViewEvent(false);
+  };
+
+  const openModalViewEvent = () => {
+    setIsModalViewEvent(true);
+  };
+
+
+
 
   return (
     <div className="relative bg-custom-gray flex flex-col items-center rounded-lg overflow-hidden font-[Quicksand] gap-3 pb-6">
@@ -308,7 +319,7 @@ function Profile() {
               </div>
             </div>
             <div class="mx-auto mt-4">
-              <button class="bg-white text-black font-bold text-2xl px-4 py-2 rounded-full mb-2">
+              <button onClick={openModalViewEvent} class="bg-white text-black font-bold text-2xl px-4 py-2 rounded-full mb-2">
                 View Event
               </button>
             </div>
@@ -340,9 +351,6 @@ function Profile() {
                     (item, index) => (
                       <EventItem key={index} {...item.sukien[0]} />
                     )
-                    /* item.sukien.map((event, index) => (
-                    //   <EventItem key={index} {...event} />
-                    // )) */
                   )}
 
                   <div className="flex items-center justify-center py-4">
@@ -412,6 +420,70 @@ function Profile() {
         labelRef={labelRef}
       />
 
+      {isModalViewEvent && (
+        <div className=" fixed z-50 inset-0 overflow-auto bg-gray-500 bg-opacity-75 flex items-center justify-center">
+          <div className=" bg-gradient-to-r from-violet-500 to-fuchsia-400 relative p-10 bg-white w-2/3 rounded-md shadow-lg max-h-screen overflow-y-auto">
+            <div className="flex justify-end">
+              <button
+                onClick={closeModalViewEvent}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                <svg
+                  className="h-8 w-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {events?.map(
+              (item, index) => (
+                <div key={index} className="flex p-4 border border-black mt-4 bg-white rounded-2xl">
+                  <div className="flex">
+                    <img
+                      src={item.sukien[0].link_nam_goc}
+                      alt="Avatar User1"
+                      className="w-32 h-32 rounded-full mx-auto  mt-5"
+                    />
+                  </div>
+
+                  <div style={{ flex: '70%', padding: '10px' }}>
+                    <h2 className="text-4xl text-center font-bold mb-4">
+                      {item.sukien[0].ten_su_kien}
+                    </h2>
+
+                    <div className="text-3xl mb-4 text-center">
+                      <p>{item.sukien[0].noi_dung_su_kien}</p>
+                    </div>
+
+                    <div className="mb-4 text-right">
+                      <p>src={item.sukien[0].real_time}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex">
+                    <img
+                      src={item.sukien[0].link_nu_goc}
+                      alt="Avatar User2"
+                      className="w-32 h-32 rounded-full mx-auto mt-5"
+                    />
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
       {isModalDetailOpen && (
         <div className="fixed z-50 inset-0 overflow-auto bg-gray-500 bg-opacity-75 flex items-center justify-center">
           <div className="relative p-10 bg-white w-1/3 rounded-md shadow-lg">
@@ -467,11 +539,6 @@ function Profile() {
           </div>
         </div>
       )}
-
-
-
-
-
     </div>
   );
 }
