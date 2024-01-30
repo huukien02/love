@@ -26,7 +26,7 @@ import PaginationsButton from "../../components/Paginations/PaginationsButton";
 const MAX_FILE_SIZE = 10485760;
 
 function Profile() {
-  const [isChangeAvatar, setIsChangeAvatar] = useState(false)
+  const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
   const [openSideBarMobile, setOpenSideBarMobile] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [hover, setHover] = useState({
@@ -100,7 +100,6 @@ function Profile() {
 
       const avatarUrl = response.data.link_img;
       updateProfileAvatar(avatarUrl);
-      setIsChangeAvatar(prev => !prev)
       toast.success("Update avatar success");
     } catch (error) {
       toast.error("Error: " + error.message);
@@ -144,6 +143,7 @@ function Profile() {
 
       const userEvents = responseEvent?.data;
       const userComments = responseCmt?.data;
+
 
       setEvents(userEvents.list_sukien);
       setComments(userComments.comment_user);
@@ -195,7 +195,7 @@ function Profile() {
 
   useEffect(() => {
     checkUser();
-  }, [id, isChangeAvatar]);
+  }, [id, user]);
 
   useEffect(() => {
     getEvents(userId);
@@ -204,6 +204,15 @@ function Profile() {
   useEffect(() => {
     getComments(userId);
   }, [currentPage.comment]);
+
+  const closeModalDetail = () => {
+    setIsModalDetailOpen(false);
+  };
+
+  const openModalDetail = () => {
+    setIsModalDetailOpen(true);
+  };
+
 
   return (
     <div className="relative bg-custom-gray flex flex-col items-center rounded-lg overflow-hidden font-[Quicksand] gap-3 pb-6">
@@ -235,72 +244,88 @@ function Profile() {
         />
       </div>
 
+      <div className="w-full flex items-start">
+        <div className="flex-1 mx-auto bg-gradient-to-r from-violet-500 to-fuchsia-400 rounded-xl overflow-hidden h-[230px] flex p-4 rounded-md">
+          {/* div 1 */}
+          <div className="w-[40%] mx-auto overflow-hidden">
+            <div  >
+              <div className="flex items-center justify-center h-full">
+                <div
+                  className="relative w-[100px] h-[100px] rounded-full overflow-hidden hover:bg-neutral-800 cursor-pointer"
+                  onClick={() =>
+                    user?.id_user !== Number(id) && !!id
+                      ? null
+                      : labelRef.current?.click()
+                  }
+                >
+                  <img
+                    src={userView?.link_avatar || user.link_avatar}
+                    alt="Avatar"
+                    className="w-full h-full hover:opacity-50"
+                  />
+                  <div
+                    className={`${user?.id_user !== Number(id) && !!id ? "hidden" : null
+                      } absolute opacity-50 bottom-0 left-0 flex justify-center items-center w-full bg-neutral-600 text-white`}
+                  >
+                    Edit
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            <div className="p-8 flex flex-col items-center justify-center text-center">
+              <div className="text-2xl uppercase tracking-wide text-white font-pacifico-cursive border-b border-white mb-2">
+                @{userView?.user_name || user.user_name}
+              </div>
+              <button onClick={openModalDetail} className="text-xl bg-transparent text-white px-4 py-2 rounded-full border border-white mt-1">
+                Detail
+              </button>
+            </div>
+          </div>
 
-      <div className="w-full h-[35vh] flex justify-center md:justify-start items-end bg-gray-400 ">
-        <div
-          className="relative w-[100px] h-[100px] rounded-full overflow-hidden hover:bg-neutral-800 cursor-pointer md:ml-12 mb-5"
-          onClick={() =>
-            user?.id_user !== Number(id) && !!id
-              ? null
-              : labelRef.current?.click()
-          }
-        >
-          <img
-            src={userView?.link_avatar || user.link_avatar}
-            alt="Avatar"
-            className="w-full h-full hover:opacity-50"
-          />
-          <div
-            className={`${user?.id_user !== Number(id) && !!id ? "hidden" : null
-              } absolute opacity-50 bottom-0 left-0 flex justify-center items-center w-full bg-neutral-600 text-white`}
-          >
-            Edit
+          {/* div 2 */}
+          <div class="w-[60%] mx-auto flex flex-col justify-center">
+            <div class="flex justify-center space-x-4">
+              <div class="flex-1 flex flex-col items-center text-white">
+                <p class="text-5xl font-tratifico-cursive mb-1">
+                  {userView?.count_sukien || user.count_sukien}
+                </p>
+                <p class="text-xl font-tratifico-cursive">
+                  Events
+                </p>
+              </div>
+              <div class="flex-1 flex flex-col items-center text-white">
+                <p class="text-5xl font-tratifico-cursive mb-1">
+                  {userView?.count_view || user.count_view}
+                </p>
+                <p class="text-xl font-tratifico-cursive">
+                  View
+                </p>
+              </div>
+              <div class="flex-1 flex flex-col items-center text-white">
+                <p class="text-5xl font-tratifico-cursive mb-1"> {userView?.count_comment || user.count_comment}</p>
+                <p class="text-xl font-tratifico-cursive">Comments</p>
+              </div>
+            </div>
+            <div class="mx-auto mt-4">
+              <button class="bg-white text-black font-bold text-2xl px-4 py-2 rounded-full mb-2">
+                View Event
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="w-1/2 h-full flex items-center justify-center gap-4">
+          <button className={`py-3 px-6 text-2xl font-semibold rounded-xl ${hover.edit ? "bg-green-400 text-white" : "bg-white text-black"}`} onClick={() => setOpenEditModal(true)} onMouseEnter={() => setHoverChange({ edit: true })} onMouseLeave={() => setHoverChange({ edit: false })} >
+            Edit profile
+          </button>
+          <div className="w-12 h-12 cursor-pointer flex items-center justify-center" onMouseEnter={() => setHoverChange({ setting: true })} onMouseLeave={() => setHoverChange({ setting: false })} >
+            <img src={hover.setting ? settingIconActive : settingIcon} alt="Setting" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>
 
       <div className="w-full flex flex-col px-4 gap-3">
-        <div className="flex justify-between text-white">
-          <span className="text-4xl font-semibold">
-            @{userView?.user_name || user.user_name}
-          </span>
-          <div
-            className={`${user?.id_user !== Number(id) && !!id ? "hidden" : null
-              } flex items-center gap-4`}
-          >
-            <button
-              className={`py-3 px-6 text-2xl font-semibold rounded-xl ${hover.edit ? "bg-green-400 text-white" : "bg-white text-black"
-                }`}
-              onClick={() => setOpenEditModal(true)}
-              onMouseEnter={() => setHoverChange({ edit: true })}
-              onMouseLeave={() => setHoverChange({ edit: false })}
-            >
-              Edit profile
-            </button>
-            <div
-              className="w-12 h-12 cursor-pointer"
-              onMouseEnter={() => setHoverChange({ setting: true })}
-              onMouseLeave={() => setHoverChange({ setting: false })}
-            >
-              <img
-                src={hover.setting ? settingIconActive : settingIcon}
-                alt="Setting"
-                className="w-full g-full bg-cover"
-              />
-            </div>
-          </div>
-        </div>
-
         <div className="flex flex-col gap-3 py-4">
-          <div className="flex gap-10 text-white font-semibold text-2xl">
-            <span>{userView?.count_sukien || user.count_sukien} events</span>
-
-            <span>{userView?.count_view || user.count_view} views</span>
-            <span>
-              {userView?.count_comment || user.count_comment} comments
-            </span>
-          </div>
           <div className="w-full h-[2px] bg-gray-400 opacity-20" />
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-11 max-w-full gap-20 lg:gap-10 text-white">
             <div className="grid grid-cols-subgrid grid-cols-1 lg:col-span-7 gap-10">
@@ -315,10 +340,11 @@ function Profile() {
                     (item, index) => (
                       <EventItem key={index} {...item.sukien[0]} />
                     )
-                    // /* item.sukien.map((event, index) => (
+                    /* item.sukien.map((event, index) => (
                     //   <EventItem key={index} {...event} />
                     // )) */
                   )}
+
                   <div className="flex items-center justify-center py-4">
                     <span
                       className="text-xl text-white hover:opacity-40 cursor-pointer"
@@ -379,14 +405,73 @@ function Profile() {
         </div>
       </div>
 
-
-
       <EditModal
         openEditModal={openEditModal}
         setOpenEditModal={setOpenEditModal}
         user={user}
         labelRef={labelRef}
       />
+
+      {isModalDetailOpen && (
+        <div className="fixed z-50 inset-0 overflow-auto bg-gray-500 bg-opacity-75 flex items-center justify-center">
+          <div className="relative p-10 bg-white w-1/3 rounded-md shadow-lg">
+            <div className="flex justify-end">
+              <button
+                onClick={closeModalDetail}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                <svg
+                  className="h-8 w-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="mt-6">
+              <h2 className="text-3xl font-bold mb-4">Details User</h2>
+              <div>
+                <p className="text-2xl text-gray-700">
+                  <strong>User : </strong>
+                  {user?.user_name}
+                </p>
+                <p className="text-2xl text-gray-700">
+                  <strong>Email : </strong>
+                  {user?.email}
+                </p>
+                <p className="text-2xl text-gray-700">
+                  <strong>IP : </strong>
+                  {user?.ip_register}
+                </p>
+                <p className="text-2xl text-gray-700">
+                  <strong>Device : </strong> {user?.device_register}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeModalDetail}
+                className="text-2xl bg-blue-500 text-white px-4 py-2 rounded text-xl"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
+
+
     </div>
   );
 }
