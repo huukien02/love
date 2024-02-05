@@ -466,7 +466,7 @@ function Profile() {
                     </div>
 
                     <div className="mb-4 text-right">
-                      <p>src={item.sukien[0].real_time}</p>
+                      <p>{item.sukien[0].real_time}</p>
                     </div>
                   </div>
 
