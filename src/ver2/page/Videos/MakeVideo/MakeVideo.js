@@ -21,6 +21,12 @@ function MakeVideo() {
   const [showImg, setShowImg] = useState({ img1: null });
   const [randomImages, setRandomImages] = useState(null);
 
+  const [isUpnewImage, setIsUpNewImage] = useState(true)
+  const [selectedOldImage, setSelectedOldImage] = useState(false);
+  const [linkOldImage, setLinkOldImage] = useState(null)
+
+  const [listOldImage, setListOldImage] = useState([])
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -155,6 +161,7 @@ function MakeVideo() {
   const link = queryParams.get("link") || VIDEO_DEFAULT;
 
   const uploadImage = async (image1) => {
+    console.log(image1)
     if (idUser === null) {
       toast.warning("Login is required");
       navigate("/login");
@@ -188,13 +195,11 @@ function MakeVideo() {
 
   const fetchData = async () => {
     if (!tenVideo.trim()) return toast.warning("Enter Name Video!");
-
-    if (!showImg.img1) return toast.warning("Image require!");
+    if (!showImg.img1 && !linkOldImage) return toast.warning("Image require!");
 
     setIsLoading(true);
     try {
       const device = await getMyDetailUser();
-
       const response = await axios.get(
         `https://lhvn.online/getdata/genvideo?id_video=${id}&device_them_su_kien=${device.browser}&ip_them_su_kien=${device.ip}&id_user=${idUser}&image=${imageVid}&ten_video=${tenVideo}`,
         {
@@ -219,6 +224,36 @@ function MakeVideo() {
       setIsLoading(false);
     }
   };
+
+  const handleUploadOldImage = async (src) => {
+    const img = new Image();
+    img.src = src;
+    const imageObject = {
+      src: img.src,
+      width: img.width,
+      height: img.height
+    };
+    console.log(imageObject)
+    setSelectedOldImage(true)
+    setLinkOldImage(src)
+  }
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://metatechvn.store/lovehistory/user/video/240?trang=1');
+
+        setListOldImage(response.data.list_sukien_video)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+
 
   return (
     <>
@@ -247,37 +282,79 @@ function MakeVideo() {
             </div>
 
             <div className="flex items-center justify-center">
-              <div className="relative responsiveImg create-video">
-                <img className="create-video-add" src={add} alt="" />
 
-                <div
-                  className="responsiveImg absolute cursor-pointer w-full h-full rounded-[50%] bg-center bg-no-repeat bg-cover bottom-0 "
-                  style={
-                    showImg.img1
-                      ? { backgroundImage: `url(${showImg.img1})` }
-                      : null
-                  }
-                ></div>
 
-                <input
-                  onChange={(e) => {
-                    handleChangeImage(e, setImage1, "img1");
-                  }}
-                  type="file"
-                  accept="image/*"
-                  id="img1"
-                  className={
-                    image1
-                      ? " opacity-0 responsiveImg cursor-pointer w-full h-full rounded-[50%]  bg-center bg-no-repeat bg-cover"
-                      : " opacity-0 cursor-pointer w-full h-full rounded-[50%] absolute bg-center bg-no-repeat bg-black"
-                  }
-                />
-              </div>
+              {!selectedOldImage ?
+                <div className="relative responsiveImg create-video">
+                  <img className="create-video-add" src={add} alt="" />
+                  <div
+                    className="responsiveImg absolute cursor-pointer w-full h-full rounded-[50%] bg-center bg-no-repeat bg-cover bottom-0 "
+                    style={
+                      showImg.img1
+                        ? { backgroundImage: `url(${showImg.img1})` }
+                        : null
+                    }
+                  ></div>
+                  <input
+                    disabled={!isUpnewImage}
+                    onChange={(e) => {
+                      handleChangeImage(e, setImage1, "img1");
+                    }}
+                    type="file"
+                    accept="image/*"
+                    id="img1"
+                    className={
+                      image1
+                        ? " opacity-0 responsiveImg cursor-pointer w-full h-full rounded-[50%]  bg-center bg-no-repeat bg-cover"
+                        : " opacity-0 cursor-pointer w-full h-full rounded-[50%] absolute bg-center bg-no-repeat bg-black"
+                    }
+                  />
+                </div> :
+                <div className="relative responsiveImg create-video">
+                  <img className="create-video-add" src={add} alt="" />
+                  <div
+                    className="responsiveImg absolute cursor-pointer w-full h-full rounded-[50%] bg-center bg-no-repeat bg-cover bottom-0 "
+                    style={
+                      linkOldImage
+                        ? { backgroundImage: `url(${linkOldImage})` }
+                        : null
+                    }
+                  ></div>
+                </div>
+              }
             </div>
 
+            <div >
+
+              {!isUpnewImage &&
+                <div className="bg-white flex flex-wrap">
+                  {listOldImage?.slice(0, 3).map((item, index) => {
+                    return (
+                      <div key={index} className="w-1/3 p-4">
+                        <img
+                          onClick={() => handleUploadOldImage(item.sukien_video[0].link_image)}
+                          className="w-full h-full object-cover border border-gray-500 cursor-pointer"
+                          src={item.sukien_video[0].link_image}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+
+              <div className="mt-5 flex justify-center space-x-4">
+                {!isUpnewImage ?
+                  <button onClick={() => { setSelectedOldImage(false); setIsUpNewImage(true) }} className="bg-green-500 text-white text-3xl px-4 py-2 rounded-md">
+                    New Image
+                  </button> :
+                  <button onClick={() => { setShowImg({ image1: null }); setSelectedOldImage(false); setIsUpNewImage(false) }} className="bg-green-500 text-white text-3xl px-4 py-2 rounded-md">
+                    Old Image
+                  </button>}
+              </div>
+            </div>
             <button
               onClick={() => fetchData()}
-              className="flex items-center justify-center transition-transform duration-300 start-video "
+              className="mt-5 flex items-center justify-center transition-transform duration-300 start-video "
             >
               Start
             </button>
