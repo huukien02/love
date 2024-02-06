@@ -245,8 +245,6 @@ function MakeVideo() {
     fetchData();
   }, [user]);
 
-
-
   return (
     <>
       <Header
