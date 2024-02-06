@@ -195,7 +195,7 @@ function MakeVideo() {
 
   const fetchData = async () => {
     if (!tenVideo.trim()) return toast.warning("Enter Name Video!");
-    if (!showImg.img1 && !linkOldImage) return toast.warning("Image require!");
+    if (!showImg.img1) return toast.warning("Image require!");
 
     setIsLoading(true);
     try {
@@ -226,14 +226,6 @@ function MakeVideo() {
   };
 
   const handleUploadOldImage = async (src) => {
-    const img = new Image();
-    img.src = src;
-    const imageObject = {
-      src: img.src,
-      width: img.width,
-      height: img.height
-    };
-    console.log(imageObject)
     setSelectedOldImage(true)
     setLinkOldImage(src)
   }
