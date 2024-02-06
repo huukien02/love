@@ -273,7 +273,6 @@ function MakeVideo() {
 
             <div className="flex items-center justify-center">
 
-
               {!selectedOldImage ?
                 <div className="relative responsiveImg create-video">
                   <img className="create-video-add" src={add} alt="" />
